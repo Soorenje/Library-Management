@@ -5,6 +5,7 @@ const userController = require("./Controllers/userController");
 const rentModel = require("./models/Rent")
 
 const app = express();
+app.use(express.json())
 
 app.get("/api/users", (req, res) => {
   userController.getUsers(req, res);
@@ -50,7 +51,7 @@ app.post("/api/users/login", (req, res) => {
   userController.userLogin(req, res);
 });
 
-app.put("/api/users/edit", (req, res) => {
+app.put("/api/users/edit/:id", (req, res) => {
   userController.userEdit(req, res);
 });
 

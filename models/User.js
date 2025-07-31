@@ -73,7 +73,11 @@ const userLoginonDB = async (username, email) => {
   });
   if (mainUser) {
     return {
-      message: `Login Successfully \nusername: ${mainUser.username}  email: ${mainUser.email}`,
+      message: [
+        "Login Successfully",
+        `username: ${mainUser.username}`,
+        `email: ${mainUser.email}`
+      ],
       statusCode: 200,
     };
   } else {
@@ -89,7 +93,7 @@ const userEditonDB = async (userId, reqBody) => {
   const isUsernameExists = await usersCollection.findOne({
     username: username,
     _id: { $ne: new ObjectId(userId) },
-  });
+  }); 
 
   if (name === "" || username === "" || email === "") {
     return {

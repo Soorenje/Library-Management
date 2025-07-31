@@ -1,19 +1,11 @@
 const rentModel = require("./../models/Rent");
-const url = require("url");
 
-const bookRent = (req, res) => {
-  let reqBody = "";
 
-  req.on("data", (data) => {
-    reqBody += data.toString();
-  });
+const bookRent = async (req, res) => {
+  const { userid, bookid } = req.body;
+  const rent = await rentModel.bookRentonDB(userid, bookid);
 
-  req.on("end", async () => {
-    const { userid, bookid } = JSON.parse(reqBody);
-    const rent = await rentModel.bookRentonDB(userid, bookid);
-
-    res.status(rent.statusCode).json(rent.message);
-  });
+  res.status(rent.statusCode).json(rent.message);
 };
 
 const bookBack = async (req, res) => {

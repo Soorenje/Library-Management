@@ -1,6 +1,6 @@
 {
   "name": "ketabkhone",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "main": "db.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
