@@ -2,6 +2,7 @@ const express = require("express");
 const bookController = require("./Controllers/bookController");
 const rentController = require("./Controllers/rentController");
 const userController = require("./Controllers/userController");
+const rentModel = require("./models/Rent")
 
 const app = express();
 
@@ -37,11 +38,11 @@ app.post("/api/users", (req, res) => {
   userController.addUser(req, res);
 });
 
-app.put("/api/users/upgrade", (req, res) => {
+app.put("/api/users/upgrade/:id", (req, res) => {
   userController.userUpgrade(req, res);
 });
 
-app.put("api/users/crime/:id", (req, res) => {
+app.put("/api/users/crime/:id", (req, res) => {
   userController.penaltyPoints(req, res);
 });
 
@@ -50,8 +51,14 @@ app.post("/api/users/login", (req, res) => {
 });
 
 app.put("/api/users/edit", (req, res) => {
-  userController.userEdit(req , res);
+  userController.userEdit(req, res);
 });
+
+app.put("/api/books/count/:id", (req, res) => {
+  bookController.bookCounts(req, res);
+});
+
+rentModel.applyLateFees() 
 
 app.listen(8000, () => {
   console.log("Server Running On Port 8000");

@@ -1,3 +1,4 @@
+const { count } = require("console");
 const { Connection } = require("./../db");
 const { ObjectId } = require("mongodb");
 
@@ -10,12 +11,12 @@ const bookRentonDB = async (userid, bookid) => {
   const isFreeBook = await booksCollection.findOne({
     _id: new ObjectId(bookid),
   });
-  if (isFreeBook.free === 1) {
+  if (isFreeBook.count >= 1) {
     const setBookAsRented = await booksCollection.updateOne(
       { _id: new ObjectId(bookid) },
       {
-        $set: {
-          free: 0,
+        $inc: {
+          count: -1,
         },
       }
     );
@@ -26,6 +27,8 @@ const bookRentonDB = async (userid, bookid) => {
     await rentsCollection.insertOne({
       userid: userid,
       bookid: bookid,
+      borrowedAt: new Date(Date.now()),
+      returnedAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -52,8 +55,8 @@ const bookBackonDB = async (bookId) => {
     await booksCollection.updateOne(
       { _id: new ObjectId(bookId) },
       {
-        $set: {
-          free: 1,
+        $inc: {
+          count: +1,
         },
       }
     );
@@ -67,7 +70,34 @@ const bookBackonDB = async (bookId) => {
   }
 };
 
+const applyLateFees = async () => {
+  const db = await Connection();
+  const rentsCollection = db.collection("rents");
+  const usersCollection = db.collection("users");
+  const today = new Date();
+  const lateRent = await rentsCollection
+    .find({
+      returnedAt: { $lt: today },
+    })
+    .toArray();
+  for (let index = 0; index < lateRent.length; index++) {
+    const lateMS = Math.floor(today - lateRent[index].returnedAt);
+    const daysLate = Math.floor(lateMS / (1000 * 60 * 60 * 24));
+    const fee = daysLate * 10000;
+    const updateCrime = await usersCollection.updateOne(
+      { _id: new ObjectId(lateRent[index].userid) },
+      {
+        $set: {
+          crime: fee,
+        },
+      }
+    );
+    console.log(updateCrime);
+  }
+};
+
 module.exports = {
   bookRentonDB,
   bookBackonDB,
+  applyLateFees,
 };

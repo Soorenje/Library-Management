@@ -1,5 +1,7 @@
 const url = require("url");
 const BookModel = require("./../models/Book");
+const { count } = require("console");
+const { json } = require("stream/consumers");
 
 const getBooks = async (req, res) => {
   const books = await BookModel.getAll();
@@ -22,7 +24,7 @@ const addBook = async (req, res) => {
   req.on("end", async () => {
     const newBook = {
       ...JSON.parse(book),
-      free: 1,
+      count: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -47,9 +49,24 @@ const bookEdit = (req, res) => {
   });
 };
 
+const bookCounts = (req , res) => {
+  const bookId = req.params.id
+  let body = ""
+  req.on("data" , (data) => {
+    body += data.toString()
+  })
+
+  req.on("end"  , async () => {
+    const reqBody = JSON.parse(body)
+    const addCount = await BookModel.bookCountonDB(bookId , reqBody)
+    res.json(addCount.message)
+  })
+}
+
 module.exports = {
   getBooks,
   deleteBook,
   addBook,
   bookEdit,
+  bookCounts
 };

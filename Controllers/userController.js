@@ -23,7 +23,7 @@ const addUser = (req, res) => {
 const userUpgrade = async (req, res) => {
   const userId = req.params.id;
   const upgrade = await userModel.userUpgradeonDB(userId);
-  res.json(upgrade);
+  res.json(upgrade.message);
 };
 
 const penaltyPoints = (req, res) => {
@@ -32,7 +32,7 @@ const penaltyPoints = (req, res) => {
   reqBody = "";
 
   req.on("data", (data) => {
-    reqBody += data;
+    reqBody += data.toString();
   });
 
   req.on("end", async () => {
@@ -68,8 +68,8 @@ const userEdit = (req, res) => {
   });
 
   req.on("end", async () => {
-    const { name, username, email } = JSON.parse(user);
-    const edit = await userModel.userEditonDB(userId, name, username, email);
+    const reqBody = JSON.parse(user);
+    const edit = await userModel.userEditonDB(userId, reqBody);
 
     res.status(edit.statusCode).json(edit.message);
   });

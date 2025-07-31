@@ -27,6 +27,8 @@ const addUsersonDB = async (name, username, email) => {
       email: email,
       crime: 0,
       role: "USER",
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
     return { message: "User Added Successfully", statusCode: 201 };
   }
@@ -54,7 +56,7 @@ const penaltyPointsonDB = async (userId, crime) => {
   await usersCollection.updateOne(
     { _id: new ObjectId(userId) },
     {
-      $set: {
+      $inc: {
         crime: crime,
       },
     }
@@ -79,9 +81,10 @@ const userLoginonDB = async (username, email) => {
   }
 };
 
-const userEditonDB = async (userId, name, username, email) => {
+const userEditonDB = async (userId, reqBody) => {
   const db = await Connection();
   const usersCollection = db.collection("users");
+  const { name, username, email } = reqBody;
 
   const isUsernameExists = await usersCollection.findOne({
     username: username,

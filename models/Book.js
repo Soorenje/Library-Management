@@ -3,6 +3,7 @@ const fs = require("fs");
 const { Connection } = require("./../db");
 const { ObjectId } = require("mongodb");
 const { title } = require("process");
+const { count } = require("console");
 
 const getAll = async () => {
   const db = await Connection();
@@ -36,13 +37,11 @@ const bookAddOnDB = async (newBook) => {
 const bookEditonDB = async (bookId, reqBody) => {
   const db = await Connection();
   const booksCollection = db.collection("books");
-  const { title, author, price } = reqBody;
+  const { price } = reqBody;
   const updateBook = await booksCollection.updateOne(
     { _id: new ObjectId(bookId) },
     {
       $set: {
-        title: title,
-        author: author,
         price: price,
       },
     }
@@ -50,9 +49,22 @@ const bookEditonDB = async (bookId, reqBody) => {
   return { message: "Book Updated Successfully" };
 };
 
+const bookCountonDB = async (bookId , reqBody) => {
+  const db = await Connection()
+  const booksCollection = db.collection("books")
+  const {count} = reqBody
+  const addCount = await booksCollection.updateOne({_id: new ObjectId(bookId)} , {
+    $inc: {
+      count: count
+    }
+  })
+  return {message: "count Added Successfully"}
+}
+
 module.exports = {
   getAll,
   deleteOnDB,
   bookAddOnDB,
   bookEditonDB,
+  bookCountonDB
 };
